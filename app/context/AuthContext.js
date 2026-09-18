@@ -12,31 +12,30 @@ import {
   signInWithPopup,
   signOut,
   sendEmailVerification,
-  updateProfile,
 } from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp, onSnapshot } from "firebase/firestore";
 import { auth, db, googleProvider } from "../lib/firebase";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null);   // Firebase User object
-  const [userProfile, setUserProfile]  = useState(null);  // Firestore profile (role, phone, v.v.)
-  const [authLoading, setAuthLoading]  = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
-  // ─── Lắng nghe trạng thái auth ────────────────────────────────────────────
+  // ─── Lắng nghe trạng thái auth và profile ─────────────────────────────────
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    let unsubscribeProfile = null;
+
+    const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       setCurrentUser(firebaseUser);
       if (firebaseUser) {
-        // Lấy profile từ Firestore
+        const profileRef = doc(db, "users", firebaseUser.uid);
+        
+        // 1. Kiểm tra và tạo profile mặc định nếu chưa có
         try {
-          const profileRef = doc(db, "users", firebaseUser.uid);
           const snap = await getDoc(profileRef);
-          if (snap.exists()) {
-            setUserProfile(snap.data());
-          } else {
-            // Tạo profile mặc định nếu chưa có (vd: đăng nhập bằng Google lần đầu)
+          if (!snap.exists() || !snap.data().email) {
             const defaultProfile = {
               email: firebaseUser.email,
               displayName: firebaseUser.displayName || firebaseUser.email.split("@")[0],
@@ -44,24 +43,34 @@ export function AuthProvider({ children }) {
               phone: "",
               createdAt: serverTimestamp(),
             };
-            await setDoc(profileRef, defaultProfile);
-            setUserProfile(defaultProfile);
+            await setDoc(profileRef, defaultProfile, { merge: true });
           }
         } catch (err) {
-          console.error("Lỗi load userProfile:", err);
+          console.error("Lỗi khởi tạo profile:", err);
         }
+
+        // 2. Lắng nghe Realtime thay đổi từ Firestore
+        unsubscribeProfile = onSnapshot(profileRef, (docSnap) => {
+          if (docSnap.exists()) {
+            setUserProfile(docSnap.data());
+          }
+        });
       } else {
         setUserProfile(null);
+        if (unsubscribeProfile) unsubscribeProfile();
       }
       setAuthLoading(false);
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeProfile) unsubscribeProfile();
+    };
   }, []);
 
   // ─── Heartbeat cập nhật lastSeen (Online status) ─────────────────────────
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser || !userProfile) return; // Chỉ cập nhật heartbeat sau khi profile đã load xong để tránh race condition
     const updatePresence = async () => {
       try {
         await setDoc(
@@ -74,12 +83,10 @@ export function AuthProvider({ children }) {
       }
     };
     
-    // Cập nhật ngay lần đầu
     updatePresence();
-    // Sau đó lặp lại mỗi 60 giây
     const interval = setInterval(updatePresence, 60000);
     return () => clearInterval(interval);
-  }, [currentUser]);
+  }, [currentUser, userProfile]);
 
   // ─── Đăng nhập Email/Password ─────────────────────────────────────────────
   const login = async (email, password) => {
