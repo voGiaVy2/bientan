@@ -245,41 +245,66 @@ export default function Dashboard() {
               <button
                 className={`${styles.navItem} ${activeTab === "overview" ? styles.active : ""}`}
                 onClick={() => setActiveTab("overview")}
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
               >
-                📊 Thông tin chung
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18M9 21V9"/>
+                </svg>
+                Thông tin chung
               </button>
               <button
                 className={`${styles.navItem} ${activeTab === "editProfile" ? styles.active : ""}`}
                 onClick={() => setActiveTab("editProfile")}
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
               >
-                ✏️ Cập nhật hồ sơ
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                </svg>
+                Cập nhật hồ sơ
               </button>
               {userProfile?.role === "seller" && (
                 <button
                   className={`${styles.navItem} ${activeTab === "myProducts" ? styles.active : ""}`}
                   onClick={() => setActiveTab("myProducts")}
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
                 >
-                  📦 Sản phẩm đã đăng ({myProducts.length})
+                  <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line>
+                  </svg>
+                  Sản phẩm đã đăng ({myProducts.length})
                 </button>
               )}
               {userProfile?.role === "seller" && (
-                <button className={styles.navItem} onClick={() => router.push("/post-product")}>
-                  ➕ Đăng sản phẩm mới
+                <button className={styles.navItem} onClick={() => router.push("/post-product")} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/>
+                  </svg>
+                  Đăng sản phẩm mới
                 </button>
               )}
               {userProfile?.role === "admin" && (
                 <button
                   className={`${styles.navItem} ${activeTab === "adminPanel" ? styles.active : ""}`}
                   onClick={() => setActiveTab("adminPanel")}
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
                 >
-                  🛡️ Quản trị viên
+                  <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                  Quản trị viên
                 </button>
               )}
-              <button className={styles.navItem} onClick={() => router.push("/choose-role")}>
-                🔄 Đổi vai trò
+              <button className={styles.navItem} onClick={() => router.push("/choose-role")} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/>
+                </svg>
+                Đổi vai trò
               </button>
-              <button onClick={handleLogout} className={`${styles.navItem} ${styles.navLogout}`}>
-                🚪 Đăng xuất
+              <button onClick={handleLogout} className={`${styles.navItem} ${styles.navLogout}`} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+                </svg>
+                Đăng xuất
               </button>
             </nav>
           </aside>
