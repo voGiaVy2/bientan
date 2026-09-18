@@ -6,9 +6,8 @@ import styles from "./page.module.css";
 import Link from "next/link";
 import { productCategories } from "../data/products";
 import { useAuth } from "../context/AuthContext";
-import { db, storage } from "../lib/firebase";
+import { db } from "../lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function PostProductPage() {
   const router = useRouter();
@@ -75,13 +74,32 @@ export default function PostProductPage() {
     try {
       let imageUrl = "/images/hero.jpg";
 
-      // ── Upload ảnh lên Firebase Storage ──────────────────────────────────
+      // ── Upload ảnh lên ImgBB ──────────────────────────────────────────
       if (imageFile) {
-        setUploadProgress("Đang tải ảnh lên...");
-        const storageRef = ref(storage, `products/${currentUser.uid}/${Date.now()}_${imageFile.name}`);
-        await uploadBytes(storageRef, imageFile);
-        imageUrl = await getDownloadURL(storageRef);
-        setUploadProgress("Ảnh đã tải lên!");
+        setUploadProgress("Đang tải ảnh lên máy chủ...");
+        
+        const imgbbKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
+        if (!imgbbKey) {
+          alert("Lỗi: Chưa cấu hình ImgBB API Key trong Vercel!");
+          setIsSubmitting(false);
+          return;
+        }
+
+        const formDataImg = new FormData();
+        formDataImg.append("image", imageFile);
+
+        const uploadRes = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
+          method: "POST",
+          body: formDataImg,
+        });
+        
+        const uploadData = await uploadRes.json();
+        if (uploadData.success) {
+          imageUrl = uploadData.data.url;
+          setUploadProgress("Ảnh đã tải lên thành công!");
+        } else {
+          throw new Error("Tải ảnh thất bại. Dịch vụ lưu trữ đang bận.");
+        }
       }
 
       // ── Lưu sản phẩm vào Firestore ────────────────────────────────────────
