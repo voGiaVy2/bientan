@@ -1,0 +1,137 @@
+.container {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  background-color: var(--bg-main);
+  position: relative;
+  overflow: hidden;
+}
+
+.backgroundDecor {
+  position: absolute;
+  top: -10%;
+  right: -5%;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
+  z-index: 0;
+}
+
+.content {
+  position: relative;
+  z-index: 10;
+  max-width: 900px;
+  width: 100%;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.header h1 {
+  margin-bottom: 1rem;
+  color: var(--text-main);
+}
+
+.header p {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.rolesContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .rolesContainer {
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+}
+
+.roleCard {
+  background-color: var(--bg-main);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.roleCard:hover {
+  border-color: var(--primary);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.iconWrapper {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background-color: rgba(14, 165, 233, 0.1);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  transition: var(--transition);
+}
+
+.roleCard:hover .iconWrapper {
+  background-color: var(--primary);
+  color: white;
+}
+
+/* Seller Card specialized styles */
+.sellerCard .iconWrapper {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.sellerCard:hover {
+  border-color: #10b981;
+}
+
+.sellerCard:hover .iconWrapper {
+  background-color: #10b981;
+  color: white;
+}
+
+.roleTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 1rem;
+}
+
+.roleDesc {
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.loadingState {
+  text-align: center;
+  margin-top: 3rem;
+  font-weight: 500;
+  color: var(--primary);
+  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
