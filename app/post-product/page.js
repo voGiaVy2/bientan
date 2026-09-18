@@ -234,8 +234,9 @@ export default function PostProductPage() {
             </div>
 
             {uploadProgress && (
-              <div style={{ padding: '0.75rem 1rem', background: 'rgba(14,165,233,0.1)', borderRadius: 'var(--radius-md)', color: 'var(--primary)', fontSize: '0.9rem' }}>
-                ⏳ {uploadProgress}
+              <div style={{ padding: '0.75rem 1rem', background: 'rgba(14,165,233,0.1)', borderRadius: 'var(--radius-md)', color: 'var(--primary)', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="spinner"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                {uploadProgress}
               </div>
             )}
 
