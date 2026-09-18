@@ -59,6 +59,28 @@ export function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
+  // ─── Heartbeat cập nhật lastSeen (Online status) ─────────────────────────
+  useEffect(() => {
+    if (!currentUser) return;
+    const updatePresence = async () => {
+      try {
+        await setDoc(
+          doc(db, "users", currentUser.uid),
+          { lastSeen: serverTimestamp() },
+          { merge: true }
+        );
+      } catch (err) {
+        console.error("Lỗi cập nhật presence:", err);
+      }
+    };
+    
+    // Cập nhật ngay lần đầu
+    updatePresence();
+    // Sau đó lặp lại mỗi 60 giây
+    const interval = setInterval(updatePresence, 60000);
+    return () => clearInterval(interval);
+  }, [currentUser]);
+
   // ─── Đăng nhập Email/Password ─────────────────────────────────────────────
   const login = async (email, password) => {
     const result = await signInWithEmailAndPassword(auth, email, password);

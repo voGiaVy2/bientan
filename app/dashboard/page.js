@@ -10,6 +10,107 @@ import {
   collection, query, where, orderBy, onSnapshot, doc, deleteDoc, updateDoc, serverTimestamp
 } from "firebase/firestore";
 
+function AdminPanel({ currentUser }) {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    // Cập nhật thời gian hiện tại mỗi phút để tính online chính xác
+    const interval = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (snap) => {
+      setUsers(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleChangeRole = async (userId, newRole) => {
+    if (!confirm(`Xác nhận đổi vai trò thành ${newRole}?`)) return;
+    try {
+      await updateDoc(doc(db, "users", userId), { role: newRole });
+    } catch (err) {
+      alert("Lỗi khi cập nhật vai trò!");
+      console.error(err);
+    }
+  };
+
+  const onlineUsersCount = users.filter(u => {
+    if (!u.lastSeen) return false;
+    return now - u.lastSeen.toMillis() < 180000;
+  }).length;
+
+  return (
+    <section className={styles.contentSection}>
+      <h2 className={styles.sectionTitle}>Bảng Điều Khiển Quản Trị Viên</h2>
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
+          <span className={styles.statLabel}>Tổng người dùng</span>
+          <span className={styles.statValue}>{users.length}</span>
+        </div>
+        <div className={styles.statCard}>
+          <span className={styles.statLabel}>Đang Online (3 phút)</span>
+          <span className={styles.statValue} style={{ color: "#10b981" }}>{onlineUsersCount}</span>
+        </div>
+      </div>
+
+      <div className={styles.tableResponsive} style={{ marginTop: "2rem" }}>
+        {loading ? (
+          <p>Đang tải danh sách người dùng...</p>
+        ) : (
+          <table className={styles.adminUsersTable}>
+            <thead>
+              <tr>
+                <th>Tên Hiển Thị</th>
+                <th>Email</th>
+                <th>Điện Thoại</th>
+                <th>Trạng Thái</th>
+                <th>Vai Trò</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((u) => {
+                const isOnline = u.lastSeen && (now - u.lastSeen.toMillis() < 180000);
+                return (
+                  <tr key={u.id}>
+                    <td style={{ fontWeight: 500 }}>{u.displayName || "Chưa có tên"}</td>
+                    <td style={{ color: "var(--text-muted)" }}>{u.email}</td>
+                    <td>{u.phone || "---"}</td>
+                    <td>
+                      {isOnline ? (
+                        <span className={styles.statusOnline}>Online</span>
+                      ) : (
+                        <span className={styles.statusOffline}>Offline</span>
+                      )}
+                    </td>
+                    <td>
+                      <select 
+                        value={u.role || "buyer"} 
+                        onChange={(e) => handleChangeRole(u.id, e.target.value)}
+                        className={styles.roleSelect}
+                        disabled={u.id === currentUser.uid}
+                      >
+                        <option value="buyer">Người mua</option>
+                        <option value="seller">Người bán</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function Dashboard() {
   const router = useRouter();
   const { currentUser, userProfile, authLoading, logout } = useAuth();
@@ -130,8 +231,11 @@ export default function Dashboard() {
                 <h3 className={styles.userName}>{displayName}</h3>
                 <p className={styles.userEmail}>{currentUser.email}</p>
                 {userProfile?.role && (
-                  <span className={`${styles.roleBadge} ${userProfile.role === "seller" ? styles.sellerBadge : styles.buyerBadge}`}>
-                    {userProfile.role === "seller" ? "Người Bán" : "Người Mua"}
+                  <span className={`${styles.roleBadge} ${
+                    userProfile.role === "admin" ? styles.adminBadge :
+                    userProfile.role === "seller" ? styles.sellerBadge : styles.buyerBadge
+                  }`}>
+                    {userProfile.role === "admin" ? "Quản Trị Viên" : userProfile.role === "seller" ? "Người Bán" : "Người Mua"}
                   </span>
                 )}
               </div>
@@ -161,6 +265,14 @@ export default function Dashboard() {
               {userProfile?.role === "seller" && (
                 <button className={styles.navItem} onClick={() => router.push("/post-product")}>
                   ➕ Đăng sản phẩm mới
+                </button>
+              )}
+              {userProfile?.role === "admin" && (
+                <button
+                  className={`${styles.navItem} ${activeTab === "adminPanel" ? styles.active : ""}`}
+                  onClick={() => setActiveTab("adminPanel")}
+                >
+                  🛡️ Quản trị viên
                 </button>
               )}
               <button className={styles.navItem} onClick={() => router.push("/choose-role")}>
@@ -226,7 +338,9 @@ export default function Dashboard() {
                     </div>
                     <div className={styles.infoItem}>
                       <span className={styles.infoLabel}>Vai trò</span>
-                      <span className={styles.infoValue}>{userProfile?.role === "seller" ? "Người Bán" : "Người Mua"}</span>
+                      <span className={styles.infoValue}>
+                        {userProfile?.role === "admin" ? "Quản Trị Viên" : userProfile?.role === "seller" ? "Người Bán" : "Người Mua"}
+                      </span>
                     </div>
                     <div className={styles.infoItem}>
                       <span className={styles.infoLabel}>Xác thực email</span>
@@ -357,6 +471,11 @@ export default function Dashboard() {
                   )}
                 </div>
               </section>
+            )}
+
+            {/* ─── Admin Panel Tab ───────────────────────── */}
+            {activeTab === "adminPanel" && userProfile?.role === "admin" && (
+              <AdminPanel currentUser={currentUser} />
             )}
 
           </main>

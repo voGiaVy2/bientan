@@ -387,3 +387,64 @@
   font-weight: 500;
 }
 
+/* ─── Admin Panel ───────────────────────────── */
+.adminBadge {
+  background-color: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.adminUsersTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  margin-top: 1rem;
+}
+
+.adminUsersTable th,
+.adminUsersTable td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.adminUsersTable th {
+  background-color: var(--bg-subtle);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.adminUsersTable tr:hover {
+  background-color: var(--bg-subtle);
+}
+
+.statusOnline {
+  color: #10b981;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.statusOnline::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #10b981;
+}
+
+.statusOffline {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.roleSelect {
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-main);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
