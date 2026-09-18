@@ -56,6 +56,10 @@ export default function Header() {
     { href: "/documents", label: "Tài Liệu Kỹ Thuật" },
   ];
 
+  if (userProfile?.role === "admin") {
+    navLinks.push({ href: "/dashboard?tab=admin", label: "Quản Trị Viên" });
+  }
+
   return (
     <>
       <header className={`${styles.header} ${scrolled ? styles.scrolled : ""}`}>

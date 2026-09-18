@@ -138,6 +138,11 @@ export default function Dashboard() {
         displayName: userProfile.displayName || "",
         phone: userProfile.phone || "",
       });
+      // Nếu có query param tab=admin thì mở tab Admin
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("tab") === "admin" && userProfile.role === "admin") {
+        setActiveTab("adminPanel");
+      }
     }
   }, [userProfile]);
 
