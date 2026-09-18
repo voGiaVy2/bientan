@@ -11,7 +11,7 @@ const documentData = [
     type: "User Manual",
     size: "2.1 MB",
     date: "2011",
-    url: "/documents/vacon-10.pdf",
+    url: "/documents/vacon-10-user-manual-3692-attach1.pdf",
   },
   {
     id: 2,
@@ -20,7 +20,7 @@ const documentData = [
     type: "User Manual",
     size: "4.5 MB",
     date: "2017",
-    url: "/documents/powerflex-400.pdf",
+    url: "/documents/powerlfex-400-user-manual-9238-attach1.pdf",
   },
   {
     id: 3,
@@ -29,7 +29,7 @@ const documentData = [
     type: "Design Guide",
     size: "3.8 MB",
     date: "2016",
-    url: "/documents/vlt-micro-drive-fc51.pdf",
+    url: "/documents/danfoss-vlt-fc051-design-manual-8504-attach1.pdf",
   },
   {
     id: 4,
@@ -38,7 +38,7 @@ const documentData = [
     type: "Programming Manual",
     size: "5.2 MB",
     date: "2025",
-    url: "/documents/altivar-212.pdf",
+    url: "/documents/ATV212_programming_manual_EN_S1A53838_04.pdf",
   }
 ];
 
