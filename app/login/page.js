@@ -42,11 +42,19 @@ export default function Login() {
     setError("");
     setGoogleLoading(true);
     try {
-      await loginWithGoogle();
-      window.location.href = "/dashboard";
+      const result = await loginWithGoogle();
+      // Kiểm tra xem tài khoản này có phải là tài khoản mới vừa được tạo qua Google không
+      const isNewUser = result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
+      
+      if (isNewUser) {
+        // Nếu là user mới, chuyển hướng sang trang chọn vai trò giống hệt lúc Đăng ký
+        window.location.href = "/choose-role";
+      } else {
+        window.location.href = "/dashboard";
+      }
     } catch (err) {
       if (err.code !== "auth/popup-closed-by-user") {
-        setError("Đăng nhập Google thất bại. Vui lòng thử lại.");
+        setError(`Đăng nhập Google thất bại: ${err.message}`);
       }
     } finally {
       setGoogleLoading(false);
