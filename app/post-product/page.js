@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 import Link from "next/link";
@@ -38,14 +38,18 @@ export default function PostProductPage() {
     "Hải Phòng", "Cần Thơ", "Bắc Ninh", "Khác"
   ];
 
+  const hasRedirected = useRef(false);
+
   // Bảo vệ route: chỉ seller mới được đăng tin
   useEffect(() => {
-    if (authLoading) return;
+    if (authLoading || hasRedirected.current) return;
     if (!currentUser) {
+      hasRedirected.current = true;
       router.push("/login?redirect=/post-product");
       return;
     }
     if (userProfile && userProfile.role !== 'seller') {
+      hasRedirected.current = true;
       alert("Chỉ tài khoản Người Bán mới có thể đăng tin!");
       router.push("/dashboard");
     }
@@ -108,26 +112,26 @@ export default function PostProductPage() {
       const priceFormatted = `${priceNumber.toLocaleString('vi-VN')} đ`;
 
       const productData = {
-        name:        formData.name,
-        brand:       formData.brand,
-        model:       formData.model,
-        condition:   formData.condition,
-        category:    formData.category,
+        name:        formData.name || "",
+        brand:       formData.brand || "",
+        model:       formData.model || "",
+        condition:   formData.condition || "Cũ - Hoạt động tốt",
+        category:    formData.category || "Khác",
         price:       priceFormatted,
-        priceNumber, // số nguyên để filter/sort
-        isNegotiable: formData.isNegotiable,
-        power:       formData.power,
-        voltage:     formData.voltage,
-        image:       imageUrl,
-        description: formData.description,
+        priceNumber: priceNumber || 0, // số nguyên để filter/sort
+        isNegotiable: !!formData.isNegotiable,
+        power:       formData.power || "",
+        voltage:     formData.voltage || "",
+        image:       imageUrl || "/images/hero.jpg",
+        description: formData.description || "",
         sellerAddress: formData.sellerDistrict
           ? `${formData.sellerDistrict}, ${formData.sellerAddress}`
-          : formData.sellerAddress,
-        contactPhone: formData.contactPhone,
+          : (formData.sellerAddress || ""),
+        contactPhone: formData.contactPhone || "",
         // Thông tin người bán
         sellerId:     currentUser.uid,
-        sellerEmail:  currentUser.email,
-        sellerName:   userProfile?.displayName || currentUser.email.split('@')[0],
+        sellerEmail:  currentUser.email || "",
+        sellerName:   userProfile?.displayName || currentUser?.email?.split('@')[0] || "Người bán",
         // Meta
         rating:      5.0,
         reviews:     0,
@@ -136,13 +140,26 @@ export default function PostProductPage() {
         status:      'active',
       };
 
-      const docRef = await addDoc(collection(db, "products"), productData);
+      // Thêm timeout để tránh Firebase bị treo khi Firestore chưa được cấu hình hoặc mất mạng
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 15000)
+      );
+
+      const docRef = await Promise.race([
+        addDoc(collection(db, "products"), productData),
+        timeoutPromise
+      ]);
+
       alert("Đăng tin thành công!");
       router.push(`/products/${docRef.id}`);
 
     } catch (error) {
       console.error("Lỗi khi đăng tin:", error);
-      alert("Có lỗi xảy ra khi đăng tin. Vui lòng thử lại.");
+      if (error.message === "TIMEOUT_FIREBASE") {
+        alert("Kết nối Firestore thất bại hoặc bị treo. Vui lòng kiểm tra lại Rule hoặc Database trong Firebase Console chưa được tạo.");
+      } else {
+        alert("Có lỗi xảy ra khi đăng tin. Vui lòng thử lại.");
+      }
     } finally {
       setIsSubmitting(false);
       setUploadProgress("");
