@@ -37,10 +37,10 @@ export function AuthProvider({ children }) {
           const snap = await getDoc(profileRef);
           if (!snap.exists() || !snap.data().email) {
             const defaultProfile = {
-              email: firebaseUser.email,
-              displayName: firebaseUser.displayName || firebaseUser.email.split("@")[0],
+              email: firebaseUser.email || "",
+              displayName: firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split("@")[0] : "Người dùng"),
               role: "buyer",
-              phone: "",
+              phone: firebaseUser.phoneNumber || "",
               createdAt: serverTimestamp(),
             };
             await setDoc(profileRef, defaultProfile, { merge: true });
@@ -123,8 +123,24 @@ export function AuthProvider({ children }) {
   // ─── Cập nhật role người dùng (buyer / seller) ────────────────────────────
   const updateRole = async (role) => {
     if (!currentUser) return;
+    
+    // Đảm bảo chỉ được set buyer hoặc seller từ client, admin chỉ set từ Firebase Console
+    if (role !== 'buyer' && role !== 'seller') {
+      throw new Error("Vai trò không hợp lệ. Chỉ có thể là người mua hoặc người bán.");
+    }
+
     const profileRef = doc(db, "users", currentUser.uid);
-    await setDoc(profileRef, { role }, { merge: true });
+    
+    // Thêm timeout để tránh treo
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 10000)
+    );
+
+    await Promise.race([
+      setDoc(profileRef, { role }, { merge: true }),
+      timeoutPromise
+    ]);
+
     setUserProfile((prev) => ({ ...prev, role }));
   };
 

@@ -24,6 +24,11 @@ export default function ChooseRolePage() {
       window.location.href = "/dashboard";
     } catch (err) {
       console.error(err);
+      if (err.message === "TIMEOUT_FIREBASE") {
+        alert("Kết nối Firestore thất bại hoặc bị treo. Vui lòng kiểm tra lại cấu hình Database trong Firebase.");
+      } else {
+        alert("Có lỗi xảy ra: " + (err.message || "Vui lòng thử lại."));
+      }
       setLoading(false);
     }
   };
