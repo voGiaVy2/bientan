@@ -29,7 +29,7 @@ const securityHeaders = [
       // Cho phép ảnh từ Firebase Storage và các nguồn phổ biến
       "img-src 'self' data: blob: https: https://firebasestorage.googleapis.com https://lh3.googleusercontent.com",
       // Firebase Firestore, Auth, Storage APIs
-      "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.cloudfunctions.net wss://*.firebaseio.com https://firebasestorage.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com",
+      "connect-src 'self' https://api.imgbb.com https://*.googleapis.com https://*.firebaseio.com https://*.cloudfunctions.net wss://*.firebaseio.com https://firebasestorage.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com",
       // Google Sign-In popup
       "frame-src 'self' https://*.firebaseapp.com https://accounts.google.com",
       "frame-ancestors 'self'",
