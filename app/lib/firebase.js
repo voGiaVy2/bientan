@@ -4,7 +4,7 @@
 
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeFirestore, getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -20,7 +20,11 @@ const firebaseConfig = {
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth    = getAuth(app);
-export const db      = getFirestore(app);
+
+// Sửa lỗi treo Firestore trên trình duyệt Cốc Cốc / mạng bị chặn WebSocket
+export const db = getApps().length && getApp().firestore ? getFirestore(app) : initializeFirestore(app, {
+  experimentalForceLongPolling: true,
+});
 export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
 
