@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
+import { Phone, MessageCircle } from "lucide-react";
 import { db } from "../lib/firebase";
 import {
   collection, query, orderBy, onSnapshot, addDoc,
@@ -210,7 +211,9 @@ export default function RequestsPage() {
               </div>
             ) : requests.length === 0 ? (
               <div className={styles.emptyState}>
-                <div className={styles.emptyIcon}>💬</div>
+                <div className={styles.emptyIcon} style={{ display: 'flex', justifyContent: 'center' }}>
+                  <MessageCircle size={48} color="#9ca3af" />
+                </div>
                 <h3>Chưa có bài đăng nào</h3>
                 <p>Hãy là người đầu tiên đăng bài tìm kiếm linh kiện!</p>
               </div>
@@ -246,8 +249,9 @@ export default function RequestsPage() {
                   <div className={styles.postContent}>{req.content}</div>
 
                   <div className={styles.postFooter}>
-                    <div className={styles.contactInfo}>
-                      <span>📞 Liên hệ: </span>
+                    <div className={styles.contactInfo} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Phone size={18} style={{ color: '#0068ff' }} />
+                      <span>Liên hệ: </span>
                       <strong>{req.contact}</strong>
                     </div>
                     <a
@@ -255,8 +259,9 @@ export default function RequestsPage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className={styles.contactBtn}
+                      style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
                     >
-                      💬 Nhắn Zalo
+                      <MessageCircle size={18} /> Nhắn Zalo
                     </a>
                   </div>
 

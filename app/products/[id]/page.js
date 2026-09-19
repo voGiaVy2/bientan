@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Phone, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
@@ -186,17 +187,17 @@ export default function ProductDetail({ params }) {
                 <>
                   <button
                     className={`btn-primary ${styles.contactBtn}`}
-                    style={{ backgroundColor: '#0068ff', borderColor: '#0068ff', padding: '0.875rem', fontSize: '1rem' }}
+                    style={{ backgroundColor: '#0068ff', borderColor: '#0068ff', padding: '0.875rem', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                     onClick={handleZaloContact}
                   >
-                    💬 Chat Zalo
+                    <MessageCircle size={20} /> Chat Zalo
                   </button>
                   <button
                     className={`btn-primary ${styles.contactBtn}`}
-                    style={{ backgroundColor: '#10b981', borderColor: '#10b981', padding: '0.875rem', fontSize: '1rem' }}
+                    style={{ backgroundColor: '#10b981', borderColor: '#10b981', padding: '0.875rem', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                     onClick={handleCall}
                   >
-                    📞 Gọi {product.contactPhone}
+                    <Phone size={20} /> Gọi {product.contactPhone}
                   </button>
                 </>
               )}
