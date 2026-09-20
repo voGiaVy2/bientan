@@ -26,6 +26,7 @@ import { persistentLocalCache, persistentMultipleTabManager } from 'firebase/fir
 let dbInstance;
 try {
   dbInstance = initializeFirestore(app, {
+    experimentalForceLongPolling: true,
     localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
   });
 } catch (e) {
