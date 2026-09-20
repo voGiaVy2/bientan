@@ -21,12 +21,14 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth    = getAuth(app);
 
-import { persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
+import { memoryLocalCache } from 'firebase/firestore';
 
+// Dùng memoryLocalCache thay vì persistentLocalCache để tránh QuotaExceededError
+// (persistentLocalCache lưu vào IndexedDB/localStorage → dễ bị đầy bộ nhớ)
 let dbInstance;
 try {
   dbInstance = initializeFirestore(app, {
-    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+    localCache: memoryLocalCache()
   });
 } catch (e) {
   dbInstance = getFirestore(app);
