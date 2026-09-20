@@ -7,7 +7,7 @@ import Link from "next/link";
 import { productCategories } from "../data/products";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 export default function PostProductPage() {
   const router = useRouter();
@@ -140,26 +140,33 @@ export default function PostProductPage() {
         status:      'active',
       };
 
-      // Thêm timeout để tránh Firebase bị treo khi Firestore chưa được cấu hình hoặc mất mạng
+      // Khởi tạo ID sản phẩm trước trên client
+      const newProductRef = doc(collection(db, "products"));
+      
+      // Thêm timeout để tránh Firebase bị treo khi mất mạng
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 15000)
+        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 8000)
       );
 
-      const docRef = await Promise.race([
-        addDoc(collection(db, "products"), productData),
-        timeoutPromise
-      ]);
+      try {
+        await Promise.race([
+          setDoc(newProductRef, productData),
+          timeoutPromise
+        ]);
+        alert("Đăng tin thành công!");
+      } catch (err) {
+        if (err.message === "TIMEOUT_FIREBASE") {
+          alert("Mạng hơi chậm nên đang đăng tin ngầm. Sản phẩm sẽ hiển thị ngay khi mạng ổn định!");
+        } else {
+          throw err;
+        }
+      }
 
-      alert("Đăng tin thành công!");
-      router.push(`/products/${docRef.id}`);
+      router.push(`/products/${newProductRef.id}`);
 
     } catch (error) {
       console.error("Lỗi khi đăng tin:", error);
-      if (error.message === "TIMEOUT_FIREBASE") {
-        alert("Kết nối Firestore thất bại hoặc bị treo. Vui lòng kiểm tra lại Rule hoặc Database trong Firebase Console chưa được tạo.");
-      } else {
-        alert("Có lỗi xảy ra khi đăng tin. Vui lòng thử lại.");
-      }
+      alert("Có lỗi xảy ra khi đăng tin. Vui lòng thử lại.");
     } finally {
       setIsSubmitting(false);
       setUploadProgress("");
