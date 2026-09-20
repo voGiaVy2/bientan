@@ -219,7 +219,7 @@ export default function Dashboard() {
         await updateDoc(doc(db, "users", currentUser.uid), {
           displayName: profileForm.displayName.trim(),
           phone: profileForm.phone.trim(),
-          updatedAt: serverTimestamp(),
+          updatedAt: new Date(),
         });
       };
 

@@ -135,8 +135,8 @@ export default function PostProductPage() {
         // Meta
         rating:      5.0,
         reviews:     0,
-        createdAt:   serverTimestamp(),
-        updatedAt:   serverTimestamp(),
+        createdAt:   new Date(),
+        updatedAt:   new Date(),
         status:      'active',
       };
 

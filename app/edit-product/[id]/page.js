@@ -164,7 +164,7 @@ export default function EditProductPage({ params }) {
           ? `${formData.sellerDistrict}, ${formData.sellerAddress}`
           : formData.sellerAddress,
         contactPhone: formData.contactPhone,
-        updatedAt: serverTimestamp(),
+        updatedAt: new Date(),
       };
 
       const timeoutPromise = new Promise((_, reject) => 
