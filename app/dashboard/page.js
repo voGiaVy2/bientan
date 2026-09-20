@@ -173,11 +173,23 @@ export default function Dashboard() {
 
   const handleDeleteProduct = async (productId) => {
     if (!confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) return;
+    
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 5000)
+    );
+
     try {
-      await deleteDoc(doc(db, "products", productId));
+      await Promise.race([
+        deleteDoc(doc(db, "products", productId)),
+        timeoutPromise
+      ]);
     } catch (err) {
-      console.error("Lỗi xóa sản phẩm:", err);
-      alert("Không thể xóa sản phẩm. Vui lòng thử lại.");
+      if (err.message === "TIMEOUT_FIREBASE") {
+        alert("Mạng chậm, hệ thống đang xử lý ngầm. Vui lòng không làm mới (reload) trang ngay lúc này.");
+      } else {
+        console.error("Lỗi xóa sản phẩm:", err);
+        alert("Không thể xóa sản phẩm. Có thể do lỗi kết nối hoặc quyền truy cập.");
+      }
     }
   };
 
