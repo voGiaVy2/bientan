@@ -106,7 +106,7 @@ export default function Home() {
                   <div className={styles.productFooter}>
                     <span className={styles.productLocation}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                      {product.sellerAddress ? product.sellerAddress.split(',')[0] : 'Toàn quốc'}
+                      {typeof product.sellerAddress === 'string' ? product.sellerAddress.split(',')[0] : 'Toàn quốc'}
                     </span>
                     <span className={styles.productTime}>
                       {product.id > 1000000 ? 'Vừa xong' : '1 ngày trước'}
@@ -117,7 +117,7 @@ export default function Home() {
                       {product.sellerEmail ? String(product.sellerEmail).charAt(0).toUpperCase() : 'B'}
                     </div>
                     <span className={styles.sellerName}>
-                      {product.sellerEmail ? product.sellerEmail.split('@')[0] : 'BiếnTầnPro'}
+                      {typeof product.sellerEmail === 'string' ? product.sellerEmail.split('@')[0] : 'BiếnTầnPro'}
                     </span>
                   </div>
                 </div>

@@ -78,7 +78,7 @@ export default function EditProductPage({ params }) {
         setOriginalProduct(product);
 
         // Tách sellerAddress nếu có quận/huyện
-        const addressParts = product.sellerAddress?.split(", ") || [];
+        const addressParts = typeof product.sellerAddress === 'string' ? product.sellerAddress.split(", ") : [];
         const district = addressParts.length > 1 ? addressParts[0] : "";
         const province = addressParts.length > 1 ? addressParts[1] : (addressParts[0] || "TP. Hồ Chí Minh");
 

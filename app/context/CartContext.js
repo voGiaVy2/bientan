@@ -54,8 +54,8 @@ export function CartProvider({ children }) {
   };
 
   const cartTotal = cartItems.reduce((total, item) => {
-    const priceStr = item.price.replace(/[^\d]/g, ""); // Extract numbers
-    const price = parseInt(priceStr, 10);
+    const priceStr = item.price ? String(item.price).replace(/[^\d]/g, "") : "0"; // Extract numbers
+    const price = parseInt(priceStr, 10) || 0;
     return total + price * item.quantity;
   }, 0);
 
