@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, Component } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import styles from './page.module.css';
@@ -218,10 +218,41 @@ function ProductsContent() {
   );
 }
 
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#dc2626' }}>
+          <h2>Trang gặp lỗi tạm thời</h2>
+          <p style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '0.5rem' }}>
+            {this.state.error?.message || 'Lỗi không xác định'}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{ marginTop: '1rem', padding: '0.5rem 1.5rem', background: '#f97316', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+          >
+            Tải lại trang
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Đang tải trang...</div>}>
-      <ProductsContent />
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Đang tải trang...</div>}>
+        <ProductsContent />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
