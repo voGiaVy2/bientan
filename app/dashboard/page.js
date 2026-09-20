@@ -209,7 +209,7 @@ export default function Dashboard() {
     setProfileMsg("");
     try {
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 8000)
+        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 15000)
       );
 
       const updatePromise = async () => {

@@ -21,10 +21,8 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth    = getAuth(app);
 
-// Sửa lỗi treo Firestore trên trình duyệt Cốc Cốc / mạng bị chặn WebSocket
-export const db = getApps().length && getApp().firestore ? getFirestore(app) : initializeFirestore(app, {
-  experimentalForceLongPolling: true,
-});
+// Sửa lỗi khởi tạo Firebase trong Next.js
+export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
 

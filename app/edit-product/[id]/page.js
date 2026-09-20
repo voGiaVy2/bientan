@@ -55,7 +55,10 @@ export default function EditProductPage({ params }) {
     const fetchProduct = async () => {
       try {
         const docRef = doc(db, "products", params.id);
-        const snap = await getDoc(docRef);
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 15000)
+        );
+        const snap = await Promise.race([getDoc(docRef), timeoutPromise]);
 
         if (!snap.exists()) {
           alert("Sản phẩm không tồn tại!");
@@ -164,9 +167,24 @@ export default function EditProductPage({ params }) {
         updatedAt: serverTimestamp(),
       };
 
-      await updateDoc(doc(db, "products", params.id), updatedData);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 15000)
+      );
 
-      alert("Cập nhật sản phẩm thành công!");
+      try {
+        await Promise.race([
+          updateDoc(doc(db, "products", params.id), updatedData),
+          timeoutPromise
+        ]);
+        alert("Cập nhật sản phẩm thành công!");
+      } catch (err) {
+        if (err.message === "TIMEOUT_FIREBASE") {
+          alert("Mạng chậm, hệ thống đang lưu ngầm. Sản phẩm sẽ được cập nhật sớm nhất có thể.");
+        } else {
+          throw err;
+        }
+      }
+
       router.push(`/products/${params.id}`);
     } catch (error) {
       console.error("Lỗi khi cập nhật:", error);

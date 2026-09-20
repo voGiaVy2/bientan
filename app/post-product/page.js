@@ -145,7 +145,7 @@ export default function PostProductPage() {
       
       // Thêm timeout để tránh Firebase bị treo khi mất mạng
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 8000)
+        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 15000)
       );
 
       try {
