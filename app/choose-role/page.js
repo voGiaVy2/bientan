@@ -21,14 +21,10 @@ export default function ChooseRolePage() {
     setLoading(true);
     try {
       await updateRole(role);
-      window.location.href = "/dashboard";
+      router.push("/dashboard");
     } catch (err) {
       console.error(err);
-      if (err.message === "TIMEOUT_FIREBASE") {
-        alert("Kết nối Firestore thất bại hoặc bị treo. Vui lòng kiểm tra lại cấu hình Database trong Firebase.");
-      } else {
-        alert("Có lỗi xảy ra: " + (err.message || "Vui lòng thử lại."));
-      }
+      alert("Có lỗi xảy ra: " + (err.message || "Vui lòng thử lại."));
       setLoading(false);
     }
   };

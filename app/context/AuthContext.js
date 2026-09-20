@@ -134,10 +134,22 @@ export function AuthProvider({ children }) {
     // Cập nhật state nội bộ ngay lập tức để UI phản hồi nhanh
     setUserProfile((prev) => ({ ...prev, role }));
 
-    // Thực thi lưu DB ở background, không cần await để tránh bị treo khi mạng chập chờn
-    setDoc(profileRef, { role }, { merge: true }).catch((err) => {
-      console.error("Lỗi khi lưu vai trò:", err);
-    });
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error("TIMEOUT")), 5000)
+    );
+
+    try {
+      await Promise.race([
+        setDoc(profileRef, { role }, { merge: true }),
+        timeoutPromise
+      ]);
+    } catch (err) {
+      if (err.message === "TIMEOUT") {
+        console.warn("Lưu role bị chậm do mạng, sẽ tiếp tục lưu ngầm.");
+      } else {
+        throw err;
+      }
+    }
   };
 
   // ─── Đăng xuất ────────────────────────────────────────────────────────────

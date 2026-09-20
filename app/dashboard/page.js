@@ -181,30 +181,40 @@ export default function Dashboard() {
     }
   };
 
-  // ─── Cập nhật thông tin cá nhân ──────────────────────────────────────────
   const handleSaveProfile = async (e) => {
     e.preventDefault();
     if (!currentUser) return;
     setSavingProfile(true);
     setProfileMsg("");
     try {
-      await updateProfile(currentUser, {
-        displayName: profileForm.displayName.trim()
-      });
-      await updateDoc(doc(db, "users", currentUser.uid), {
-        displayName: profileForm.displayName.trim(),
-        phone: profileForm.phone.trim(),
-        updatedAt: serverTimestamp(),
-      });
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 8000)
+      );
+
+      const updatePromise = async () => {
+        await updateProfile(currentUser, {
+          displayName: profileForm.displayName.trim()
+        });
+        await updateDoc(doc(db, "users", currentUser.uid), {
+          displayName: profileForm.displayName.trim(),
+          phone: profileForm.phone.trim(),
+          updatedAt: serverTimestamp(),
+        });
+      };
+
+      await Promise.race([updatePromise(), timeoutPromise]);
+
       setProfileMsg("✅ Cập nhật thành công!");
       setIsEditingProfile(false);
-      // Refresh lại trang sau 1s
-      setTimeout(() => {
-        window.location.reload();
-      }, 800);
+      // Bỏ window.location.reload() để không kill trang, state sẽ tự update qua onSnapshot
     } catch (err) {
       console.error("Lỗi cập nhật profile:", err);
-      setProfileMsg("❌ Có lỗi xảy ra. Vui lòng thử lại.");
+      if (err.message === "TIMEOUT_FIREBASE") {
+        setProfileMsg("⚠️ Mạng chậm, đang lưu ngầm. Vui lòng không tải lại trang lúc này.");
+        setIsEditingProfile(false);
+      } else {
+        setProfileMsg("❌ Có lỗi xảy ra. Vui lòng thử lại.");
+      }
     } finally {
       setSavingProfile(false);
     }
