@@ -118,6 +118,7 @@ export default function Dashboard() {
   const [myProducts, setMyProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
+  const [deletingId, setDeletingId] = useState(null); // Trạng thái đang xóa (Khóa giao diện - Cách 1)
 
   // ─── Edit Profile State ───────────────────────────────────────────────────
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -174,8 +175,12 @@ export default function Dashboard() {
   const handleDeleteProduct = async (productId) => {
     if (!confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) return;
     
+    // Khóa giao diện (Cách 1)
+    setDeletingId(productId);
+
+    // Timeout 15s phòng trường hợp mạng rớt hẳn không phản hồi
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 5000)
+      setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 15000)
     );
 
     try {
@@ -183,13 +188,17 @@ export default function Dashboard() {
         deleteDoc(doc(db, "products", productId)),
         timeoutPromise
       ]);
+      // Thành công, Firebase tự động cập nhật danh sách qua onSnapshot
     } catch (err) {
       if (err.message === "TIMEOUT_FIREBASE") {
-        alert("Mạng chậm, hệ thống đang xử lý ngầm. Vui lòng không làm mới (reload) trang ngay lúc này.");
+        alert("Lỗi: Quá thời gian chờ. Mạng của bạn không ổn định hoặc trình duyệt đang chặn kết nối đến máy chủ.");
       } else {
         console.error("Lỗi xóa sản phẩm:", err);
-        alert("Không thể xóa sản phẩm. Có thể do lỗi kết nối hoặc quyền truy cập.");
+        alert("Lỗi: Không thể xóa do quy tắc bảo mật hoặc lỗi hệ thống Firebase.");
       }
+    } finally {
+      // Mở khóa giao diện
+      setDeletingId(null);
     }
   };
 
@@ -513,9 +522,18 @@ export default function Dashboard() {
                                   </button>
                                   <button
                                     onClick={() => handleDeleteProduct(product.id)}
-                                    style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem", backgroundColor: "#fee2e2", color: "#dc2626", border: "1px solid #fca5a5", borderRadius: "var(--radius-md)", cursor: "pointer" }}
+                                    disabled={deletingId === product.id}
+                                    style={{ 
+                                      padding: "0.4rem 0.8rem", 
+                                      fontSize: "0.85rem", 
+                                      backgroundColor: deletingId === product.id ? "#f3f4f6" : "#fee2e2", 
+                                      color: deletingId === product.id ? "#9ca3af" : "#dc2626", 
+                                      border: deletingId === product.id ? "1px solid #d1d5db" : "1px solid #fca5a5", 
+                                      borderRadius: "var(--radius-md)", 
+                                      cursor: deletingId === product.id ? "not-allowed" : "pointer" 
+                                    }}
                                   >
-                                    Xóa
+                                    {deletingId === product.id ? "Đang xóa..." : "Xóa"}
                                   </button>
                                 </div>
                               </td>
