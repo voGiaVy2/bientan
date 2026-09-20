@@ -162,8 +162,8 @@
 
 .productGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
 }
 
 .productCard {
@@ -187,7 +187,7 @@
   position: relative;
   aspect-ratio: 1;
   background-color: var(--bg-subtle);
-  padding: 2rem;
+  padding: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -274,6 +274,25 @@
   .badgeLowStock { color: #fbbf24; }
   .badgeOutStock { color: #f87171; }
 }
+
+.conditionBadge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+}
+
+.conditionBadge[data-condition="new"] { background-color: var(--primary); }
+.conditionBadge[data-condition="used"] { background-color: #f59e0b; color: #fff; }
+.conditionBadge[data-condition="broken"] { background-color: var(--danger); color: white; }
 
 .productInfo {
   padding: 1.5rem;
@@ -448,7 +467,7 @@
 
 .loadingGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1.5rem;
 }
 

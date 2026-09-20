@@ -31,16 +31,17 @@ function ProductsContent() {
   // ─── Realtime query từ Firestore ────────────────────────────────────────
   useEffect(() => {
     setLoading(true);
+    // Remove where("status", "==", "active") to avoid Firebase Composite Index requirement
     let q = query(
       collection(db, "products"),
-      where("status", "==", "active"),
       orderBy("createdAt", "desc"),
       limit(100)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setAllProducts(docs);
+      const activeDocs = docs.filter(doc => doc.status === 'active');
+      setAllProducts(activeDocs);
       setLoading(false);
     }, (err) => {
       console.error("Firestore error:", err);
@@ -132,7 +133,7 @@ function ProductsContent() {
 
           {loading ? (
             <div className={styles.loadingGrid}>
-              {[...Array(6)].map((_, i) => (
+              {[...Array(12)].map((_, i) => (
                 <div key={i} className={styles.skeletonCard}>
                   <div className={styles.skeletonImage}></div>
                   <div className={styles.skeletonLine}></div>
