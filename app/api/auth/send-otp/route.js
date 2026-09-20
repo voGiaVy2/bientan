@@ -94,7 +94,38 @@ export async function POST(req) {
       return NextResponse.json({ message: "Mật khẩu phải từ 6-128 ký tự" }, { status: 400 });
     }
 
-    // ===== 4. Tạo OTP an toàn bằng crypto =====
+    // ===== 4. Kiểm tra email đã tồn tại trong Firestore chưa =====
+    try {
+      const { initializeApp, getApps, getApp } = await import("firebase/app");
+      const { getFirestore, collection, query, where, getDocs } = await import("firebase/firestore");
+
+      const firebaseConfig = {
+        apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+        authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+        appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+      };
+      const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("email", "==", email));
+      const snap = await getDocs(q);
+
+      if (!snap.empty) {
+        return NextResponse.json(
+          { message: "Email này đã được đăng ký rồi. Vui lòng đăng nhập thay vì tạo tài khoản mới." },
+          { status: 409 } // 409 Conflict
+        );
+      }
+    } catch (checkErr) {
+      console.warn("[WARN] Không kiểm tra được email trùng lặp:", checkErr.message);
+      // Cho phép tiếp tục nếu kiểm tra lỗi (sẽ báo lỗi ở bước đăng ký cuối)
+    }
+
+    // ===== 5. Tạo OTP an toàn bằng crypto =====
     const otp = String(Math.floor(100000 + Math.random() * 900000));
 
     // Lưu OTP với thời gian hết hạn 5 phút

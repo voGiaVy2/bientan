@@ -23,6 +23,7 @@ export default function Register() {
   
   const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState("");
+  const [emailExists, setEmailExists] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
@@ -102,7 +103,8 @@ export default function Register() {
     } catch (err) {
       // Xử lý lỗi Firebase
       if (err.code === "auth/email-already-in-use") {
-        setError("Email này đã được sử dụng trên hệ thống.");
+        setEmailExists(true);
+        setError("Email này đã được đăng ký rồi. Vui lòng đăng nhập thay vì tạo tài khoản mới.");
       } else {
         setError(err.message || "Đăng ký thất bại. Vui lòng thử lại.");
       }
@@ -202,7 +204,17 @@ export default function Register() {
 
         {step === 2 && (
           <form onSubmit={handleVerifyOTP} className={styles.form}>
-            {error && <div className={styles.errorAlert}>{error}</div>}
+            {emailExists ? (
+              <div className={styles.errorAlert} style={{ textAlign: 'center' }}>
+                <strong>⚠️ Email này đã có tài khoản!</strong><br />
+                <span style={{ fontSize: '0.9rem' }}>Email <strong>{email}</strong> đã được đăng ký trước đó rồi.</span><br />
+                <Link href={`/login?email=${encodeURIComponent(email)}`} className={styles.link} style={{ display: 'inline-block', marginTop: '0.5rem', fontWeight: 700 }}>
+                  → Đi đăng nhập ngay
+                </Link>
+              </div>
+            ) : error ? (
+              <div className={styles.errorAlert}>{error}</div>
+            ) : null}
             <div className={styles.inputGroup}>
               <p style={{ marginBottom: "1rem", color: "var(--text-main)", lineHeight: 1.5 }}>
                 Mã xác nhận 6 số đã được gửi tới email <strong>{email}</strong>.
