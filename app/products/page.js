@@ -56,9 +56,9 @@ function ProductsContent() {
     const matchCat = activeCategory === "Tất cả" || product.category === activeCategory;
     const q = searchQuery.toLowerCase();
     const matchSearch = !q
-      || (product.name && product.name.toLowerCase().includes(q))
-      || (product.brand && product.brand.toLowerCase().includes(q))
-      || (product.model && product.model.toLowerCase().includes(q));
+      || (product.name && String(product.name).toLowerCase().includes(q))
+      || (product.brand && String(product.brand).toLowerCase().includes(q))
+      || (product.model && String(product.model).toLowerCase().includes(q));
     return matchCat && matchSearch;
   });
 
@@ -184,14 +184,14 @@ function ProductsContent() {
                       <div className={styles.productFooter}>
                         <span className={styles.productLocation}>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                          {product.sellerAddress ? product.sellerAddress.split(',')[0] : 'Toàn quốc'}
+                          {typeof product.sellerAddress === 'string' ? product.sellerAddress.split(',')[0] : 'Toàn quốc'}
                         </span>
                         <span className={styles.productTime}>{formatTime(product.createdAt)}</span>
                       </div>
 
                       <div className={styles.sellerMiniInfo}>
                         <div className={styles.sellerAvatar}>
-                          {product.sellerName ? product.sellerName.charAt(0).toUpperCase() : 'B'}
+                          {typeof product.sellerName === 'string' && product.sellerName.length > 0 ? product.sellerName.charAt(0).toUpperCase() : 'B'}
                         </div>
                         <span className={styles.sellerName}>
                           {product.sellerName || 'BiếnTầnPro'}
