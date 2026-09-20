@@ -267,7 +267,7 @@ export default function RequestsPage() {
                       <strong>{req.contact}</strong>
                     </div>
                     <a
-                      href={`https://zalo.me/${req.contact?.replace(/^0/, "84")}`}
+                      href={`https://zalo.me/${String(req.contact || "").replace(/^0/, "84")}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className={styles.contactBtn}

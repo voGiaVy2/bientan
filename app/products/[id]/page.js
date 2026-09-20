@@ -73,7 +73,7 @@ export default function ProductDetail({ params }) {
 
   const handleZaloContact = () => {
     if (product.contactPhone) {
-      window.open(`https://zalo.me/${product.contactPhone.replace(/^0/, '84')}`, '_blank');
+      window.open(`https://zalo.me/${String(product.contactPhone || "").replace(/^0/, '84')}`, '_blank');
     }
   };
 

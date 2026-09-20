@@ -88,7 +88,7 @@ export default function EditProductPage({ params }) {
           model: product.model || "",
           condition: product.condition || "Cũ - Hoạt động tốt",
           category: product.category || productCategories[1],
-          price: product.priceNumber?.toString() || product.price?.replace(/[^\d]/g, "") || "",
+          price: product.priceNumber?.toString() || String(product.price || "").replace(/[^\d]/g, "") || "",
           power: product.power || "",
           voltage: product.voltage || "",
           description: product.description || "",
