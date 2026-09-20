@@ -15,7 +15,7 @@ export default function CartSidebar() {
       <div className={styles.overlay} onClick={() => setIsCartOpen(false)} />
       <div className={`${styles.sidebar} ${isCartOpen ? styles.open : ''}`}>
         <div className={styles.header}>
-          <h2 className="h3 font-heading">Giỏ hàng của bạn</h2>
+          <h2 className="h3 font-heading">Sản phẩm yêu thích</h2>
           <button className={styles.closeBtn} onClick={() => setIsCartOpen(false)}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -27,9 +27,9 @@ export default function CartSidebar() {
           {cartItems.length === 0 ? (
             <div className={styles.emptyState}>
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
               </svg>
-              <p>Giỏ hàng đang trống</p>
+              <p>Chưa có sản phẩm yêu thích nào</p>
             </div>
           ) : (
             <ul className={styles.itemList}>
@@ -39,11 +39,6 @@ export default function CartSidebar() {
                   <div className={styles.itemInfo}>
                     <h4 className={styles.itemName}>{item.name}</h4>
                     <p className={styles.itemPrice}>{item.price}</p>
-                    <div className={styles.quantityControls}>
-                      <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
-                      <span>{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
-                    </div>
                   </div>
                   <button className={styles.removeBtn} onClick={() => removeFromCart(item.id)}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -56,22 +51,6 @@ export default function CartSidebar() {
           )}
         </div>
 
-        <div className={styles.footer}>
-          <div className={styles.totalRow}>
-            <span>Tổng cộng:</span>
-            <span className={styles.totalPrice}>{cartTotal.toLocaleString('vi-VN')} đ</span>
-          </div>
-          <button 
-            className={`btn-primary ${styles.checkoutBtn}`} 
-            disabled={cartItems.length === 0}
-            onClick={() => {
-              setIsCartOpen(false);
-              router.push("/checkout");
-            }}
-          >
-            Thanh Toán
-          </button>
-        </div>
       </div>
     </>
   );

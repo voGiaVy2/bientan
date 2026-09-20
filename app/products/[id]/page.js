@@ -206,7 +206,7 @@ export default function ProductDetail({ params }) {
                 onClick={() => addToCart(product)}
                 style={{ gridColumn: '1 / -1', padding: '0.875rem' }}
               >
-                Thêm Vào Giỏ Hàng
+                Thêm vào yêu thích
               </button>
             </div>
           </div>

@@ -167,8 +167,8 @@ function ProductsContent() {
                       </Link>
 
                       <div className={styles.specs}>
-                        {product.power   && <div className={styles.specItem}><span>⚡</span> {product.power}</div>}
-                        {product.voltage && <div className={styles.specItem}><span>🔌</span> {product.voltage}</div>}
+                        {product.power   && <div className={styles.specItem}>{product.power}</div>}
+                        {product.voltage && <div className={styles.specItem}>{product.voltage}</div>}
                       </div>
 
                       <div className={styles.priceWrapper}>
