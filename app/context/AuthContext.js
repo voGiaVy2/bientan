@@ -131,17 +131,13 @@ export function AuthProvider({ children }) {
 
     const profileRef = doc(db, "users", currentUser.uid);
     
-    // Thêm timeout để tránh treo
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 10000)
-    );
-
-    await Promise.race([
-      setDoc(profileRef, { role }, { merge: true }),
-      timeoutPromise
-    ]);
-
+    // Cập nhật state nội bộ ngay lập tức để UI phản hồi nhanh
     setUserProfile((prev) => ({ ...prev, role }));
+
+    // Thực thi lưu DB ở background, không cần await để tránh bị treo khi mạng chập chờn
+    setDoc(profileRef, { role }, { merge: true }).catch((err) => {
+      console.error("Lỗi khi lưu vai trò:", err);
+    });
   };
 
   // ─── Đăng xuất ────────────────────────────────────────────────────────────
