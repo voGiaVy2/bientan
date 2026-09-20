@@ -41,7 +41,7 @@ export function AuthProvider({ children }) {
               displayName: firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split("@")[0] : "Người dùng"),
               role: "buyer",
               phone: firebaseUser.phoneNumber || "",
-              createdAt: serverTimestamp(),
+              createdAt: new Date(),
             };
             await setDoc(profileRef, defaultProfile, { merge: true });
           }
@@ -75,7 +75,7 @@ export function AuthProvider({ children }) {
       try {
         await setDoc(
           doc(db, "users", currentUser.uid),
-          { lastSeen: serverTimestamp() },
+          { lastSeen: new Date() },
           { merge: true }
         );
       } catch (err) {
@@ -108,7 +108,7 @@ export function AuthProvider({ children }) {
       displayName: email.split("@")[0],
       phone: phone || "",
       role,
-      createdAt: serverTimestamp(),
+      createdAt: new Date(),
     });
 
     return result;

@@ -71,7 +71,7 @@ export default function RequestsPage() {
         role: userProfile?.role === "seller" ? "Người Bán" : "Người Mua",
         content: newContent.trim(),
         contact: newContact.trim(),
-        createdAt: serverTimestamp(),
+        createdAt: new Date(),
         comments: [],
       });
 
