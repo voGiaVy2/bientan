@@ -56,7 +56,7 @@ function ProductsContent() {
     const matchCat = activeCategory === "Tất cả" || product.category === activeCategory;
     const q = searchQuery.toLowerCase();
     const matchSearch = !q
-      || product.name.toLowerCase().includes(q)
+      || (product.name && product.name.toLowerCase().includes(q))
       || (product.brand && product.brand.toLowerCase().includes(q))
       || (product.model && product.model.toLowerCase().includes(q));
     return matchCat && matchSearch;
@@ -71,12 +71,17 @@ function ProductsContent() {
 
   const formatTime = (ts) => {
     if (!ts) return 'Vừa xong';
-    const date = ts.toDate ? ts.toDate() : new Date(ts);
-    const diff = (Date.now() - date.getTime()) / 1000;
-    if (diff < 60)   return 'Vừa xong';
-    if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
-    return `${Math.floor(diff / 86400)} ngày trước`;
+    try {
+      const date = ts.toDate ? ts.toDate() : new Date(ts);
+      if (isNaN(date.getTime())) return 'Vừa xong';
+      const diff = (Date.now() - date.getTime()) / 1000;
+      if (diff < 60)   return 'Vừa xong';
+      if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+      return `${Math.floor(diff / 86400)} ngày trước`;
+    } catch (e) {
+      return 'Vừa xong';
+    }
   };
 
   return (

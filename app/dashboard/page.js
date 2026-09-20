@@ -7,7 +7,7 @@ import styles from "./page.module.css";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../lib/firebase";
 import {
-  collection, query, where, orderBy, onSnapshot, doc, deleteDoc, updateDoc, serverTimestamp
+  collection, query, where, orderBy, onSnapshot, doc, deleteDoc, updateDoc, serverTimestamp, setDoc
 } from "firebase/firestore";
 import { updateProfile } from "firebase/auth";
 
@@ -215,11 +215,11 @@ export default function Dashboard() {
         await updateProfile(currentUser, {
           displayName: profileForm.displayName.trim()
         });
-        await updateDoc(doc(db, "users", currentUser.uid), {
+        await setDoc(doc(db, "users", currentUser.uid), {
           displayName: profileForm.displayName.trim(),
           phone: profileForm.phone.trim(),
           updatedAt: new Date(),
-        });
+        }, { merge: true });
       };
 
       await Promise.race([updatePromise(), timeoutPromise]);
