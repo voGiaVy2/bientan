@@ -9,6 +9,7 @@ import { db } from "../lib/firebase";
 import {
   collection, query, where, orderBy, onSnapshot, doc, deleteDoc, updateDoc, serverTimestamp
 } from "firebase/firestore";
+import { updateProfile } from "firebase/auth";
 
 function AdminPanel({ currentUser }) {
   const [users, setUsers] = useState([]);
@@ -187,6 +188,9 @@ export default function Dashboard() {
     setSavingProfile(true);
     setProfileMsg("");
     try {
+      await updateProfile(currentUser, {
+        displayName: profileForm.displayName.trim()
+      });
       await updateDoc(doc(db, "users", currentUser.uid), {
         displayName: profileForm.displayName.trim(),
         phone: profileForm.phone.trim(),

@@ -35,7 +35,7 @@ export function AuthProvider({ children }) {
         // 1. Kiểm tra và tạo profile mặc định nếu chưa có
         try {
           const snap = await getDoc(profileRef);
-          if (!snap.exists() || !snap.data().email) {
+          if (!snap.exists()) {
             const defaultProfile = {
               email: firebaseUser.email || "",
               displayName: firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split("@")[0] : "Người dùng"),

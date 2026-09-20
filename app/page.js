@@ -61,7 +61,6 @@ export default function Home() {
           <div className={styles.categoryGrid}>
             {categories.map((cat, index) => (
               <div key={cat.id} className={`${styles.categoryCard} animate-slide-up`} style={{animationDelay: `${0.1 * index}s`}}>
-                <span className={styles.categoryIcon}>{cat.icon}</span>
                 <h3 className={styles.categoryName}>{cat.name}</h3>
               </div>
             ))}
@@ -93,7 +92,7 @@ export default function Home() {
                       className={styles.quickAddBtn}
                       onClick={() => addToCart(product)}
                     >
-                      Thêm vào giỏ
+                      Thêm vào yêu thích
                     </button>
                   </div>
                 </div>
