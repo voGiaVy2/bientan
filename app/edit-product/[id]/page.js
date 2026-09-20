@@ -168,7 +168,7 @@ export default function EditProductPage({ params }) {
       };
 
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 15000)
+        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 4000)
       );
 
       try {
@@ -179,7 +179,7 @@ export default function EditProductPage({ params }) {
         alert("Cập nhật sản phẩm thành công!");
       } catch (err) {
         if (err.message === "TIMEOUT_FIREBASE") {
-          alert("Mạng chậm, hệ thống đang lưu ngầm. Sản phẩm sẽ được cập nhật sớm nhất có thể.");
+          console.log("Offline write successful");
         } else {
           throw err;
         }

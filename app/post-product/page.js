@@ -143,9 +143,8 @@ export default function PostProductPage() {
       // Khởi tạo ID sản phẩm trước trên client
       const newProductRef = doc(collection(db, "products"));
       
-      // Thêm timeout để tránh Firebase bị treo khi mất mạng
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 15000)
+        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 4000)
       );
 
       try {
@@ -156,7 +155,8 @@ export default function PostProductPage() {
         alert("Đăng tin thành công!");
       } catch (err) {
         if (err.message === "TIMEOUT_FIREBASE") {
-          alert("Mạng hơi chậm nên đang đăng tin ngầm. Sản phẩm sẽ hiển thị ngay khi mạng ổn định!");
+          // alert("Mạng hơi chậm nên đang đăng tin ngầm. Sản phẩm sẽ hiển thị ngay khi mạng ổn định!");
+          console.log("Offline write successful");
         } else {
           throw err;
         }

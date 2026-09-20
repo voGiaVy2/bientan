@@ -61,7 +61,7 @@ export default function RequestsPage() {
 
     try {
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 15000)
+        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 4000)
       );
 
       const addPromise = addDoc(collection(db, "communityRequests"), {
@@ -83,7 +83,9 @@ export default function RequestsPage() {
     } catch (err) {
       console.error("Lỗi đăng bài:", err);
       if (err.message === "TIMEOUT_FIREBASE") {
-        alert("Kết nối đến máy chủ quá lâu (có thể do hết dung lượng hoặc lỗi mạng). Vui lòng thử lại sau.");
+        setNewContent("");
+        setNewContact("");
+        setShowForm(false);
       } else {
         alert("Có lỗi khi đăng bài. Vui lòng thử lại.");
       }

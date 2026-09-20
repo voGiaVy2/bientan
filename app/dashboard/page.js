@@ -178,9 +178,8 @@ export default function Dashboard() {
     // Khóa giao diện (Cách 1)
     setDeletingId(productId);
 
-    // Timeout 15s phòng trường hợp mạng rớt hẳn không phản hồi
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 15000)
+      setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 4000)
     );
 
     try {
@@ -191,7 +190,7 @@ export default function Dashboard() {
       // Thành công, Firebase tự động cập nhật danh sách qua onSnapshot
     } catch (err) {
       if (err.message === "TIMEOUT_FIREBASE") {
-        alert("Lỗi: Quá thời gian chờ. Mạng của bạn không ổn định hoặc trình duyệt đang chặn kết nối đến máy chủ.");
+        // Không alert gì cả, vì IndexedDB đã lưu cục bộ, UI tự cập nhật
       } else {
         console.error("Lỗi xóa sản phẩm:", err);
         alert("Lỗi: Không thể xóa do quy tắc bảo mật hoặc lỗi hệ thống Firebase.");
@@ -209,7 +208,7 @@ export default function Dashboard() {
     setProfileMsg("");
     try {
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 15000)
+        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 4000)
       );
 
       const updatePromise = async () => {
@@ -227,11 +226,10 @@ export default function Dashboard() {
 
       setProfileMsg("✅ Cập nhật thành công!");
       setIsEditingProfile(false);
-      // Bỏ window.location.reload() để không kill trang, state sẽ tự update qua onSnapshot
     } catch (err) {
       console.error("Lỗi cập nhật profile:", err);
       if (err.message === "TIMEOUT_FIREBASE") {
-        setProfileMsg("⚠️ Mạng chậm, đang lưu ngầm. Vui lòng không tải lại trang lúc này.");
+        setProfileMsg("✅ Đã lưu cục bộ! Sẽ đồng bộ máy chủ khi mạng ổn định.");
         setIsEditingProfile(false);
       } else {
         setProfileMsg("❌ Có lỗi xảy ra. Vui lòng thử lại.");

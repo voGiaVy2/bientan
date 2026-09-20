@@ -21,8 +21,17 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth    = getAuth(app);
 
-// Sửa lỗi khởi tạo Firebase trong Next.js
-export const db = getFirestore(app);
+import { persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
+
+let dbInstance;
+try {
+  dbInstance = initializeFirestore(app, {
+    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+  });
+} catch (e) {
+  dbInstance = getFirestore(app);
+}
+export const db = dbInstance;
 export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
 
