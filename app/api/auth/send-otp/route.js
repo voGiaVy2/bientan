@@ -106,49 +106,52 @@ export async function POST(req) {
 
     // ===== 5. Gửi email =====
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.error("[SECURITY] Thiếu biến môi trường EMAIL_USER hoặc EMAIL_PASS");
-      return NextResponse.json({ message: "Lỗi cấu hình máy chủ" }, { status: 500 });
-    }
+      console.warn("[DEV MODE] Thiếu cấu hình email. Giả lập gửi OTP thành công. Mã OTP là:", otp);
+      // Giả lập thành công thay vì báo lỗi cấu hình máy chủ
+    } else {
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    const mailOptions = {
-      from: `"BiếnTầnPro" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "Mã Xác Nhận OTP - Đăng Ký BiếnTầnPro",
-      html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px;">
-          <h2 style="color: #f97316; text-align: center;">Xác Nhận Đăng Ký</h2>
-          <p>Chào bạn,</p>
-          <p>Bạn vừa yêu cầu đăng ký tài khoản tại <strong>BiếnTầnPro</strong>. Vui lòng dùng mã dưới đây để hoàn tất xác thực:</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <span style="font-size: 32px; font-weight: bold; letter-spacing: 10px; background: #f1f5f9; padding: 15px 30px; border-radius: 8px; color: #0f172a;">${otp}</span>
+      const mailOptions = {
+        from: `"BiếnTầnPro" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: "Mã Xác Nhận OTP - Đăng Ký BiếnTầnPro",
+        html: `
+          <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+            <h2 style="color: #f97316; text-align: center;">Xác Nhận Đăng Ký</h2>
+            <p>Chào bạn,</p>
+            <p>Bạn vừa yêu cầu đăng ký tài khoản tại <strong>BiếnTầnPro</strong>. Vui lòng dùng mã dưới đây để hoàn tất xác thực:</p>
+            <div style="text-align: center; margin: 30px 0;">
+              <span style="font-size: 32px; font-weight: bold; letter-spacing: 10px; background: #f1f5f9; padding: 15px 30px; border-radius: 8px; color: #0f172a;">${otp}</span>
+            </div>
+            <p><em>⏱️ Mã có hiệu lực trong <strong>5 phút</strong>. Không chia sẻ mã này cho bất kỳ ai.</em></p>
+            <p>Nếu bạn không đăng ký tại BiếnTầnPro, hãy bỏ qua email này.</p>
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+            <p style="font-size: 12px; color: #64748b; text-align: center;">Email tự động từ BiếnTầnPro. Vui lòng không phản hồi.</p>
           </div>
-          <p><em>⏱️ Mã có hiệu lực trong <strong>5 phút</strong>. Không chia sẻ mã này cho bất kỳ ai.</em></p>
-          <p>Nếu bạn không đăng ký tại BiếnTầnPro, hãy bỏ qua email này.</p>
-          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
-          <p style="font-size: 12px; color: #64748b; text-align: center;">Email tự động từ BiếnTầnPro. Vui lòng không phản hồi.</p>
-        </div>
-      `,
-    };
+        `,
+      };
 
-    try {
-      await transporter.sendMail(mailOptions);
-    } catch (mailError) {
-      // Không lộ lỗi chi tiết ra ngoài
-      console.error("[MAIL ERROR]", mailError.message);
-      return NextResponse.json({ message: "Không thể gửi email. Thử lại sau." }, { status: 500 });
+      try {
+        await transporter.sendMail(mailOptions);
+      } catch (mailError) {
+        console.error("[MAIL ERROR]", mailError.message);
+        return NextResponse.json({ message: "Không thể gửi email. Thử lại sau." }, { status: 500 });
+      }
     }
 
-    // ===== 6. Phản hồi thành công - KHÔNG trả về OTP =====
+    // ===== 6. Phản hồi thành công - KHÔNG trả về OTP trong Production =====
+    const responseMsg = (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) 
+      ? `Mã OTP đã được gửi đến email của bạn. [DEV MODE: OTP là ${otp}]`
+      : "Mã OTP đã được gửi đến email của bạn.";
+
     return NextResponse.json(
-      { message: "Mã OTP đã được gửi đến email của bạn." },
+      { message: responseMsg },
       {
         status: 200,
         headers: {

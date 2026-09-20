@@ -61,7 +61,7 @@ export default function Register() {
         throw new Error(data.message || "Lỗi khi gửi OTP.");
       }
       
-      alert("Đã gửi mã OTP 6 số đến email của bạn! (Kiểm tra cả hộp thư Rác/Spam)");
+      alert(data.message || "Đã gửi mã OTP 6 số đến email của bạn! (Kiểm tra cả hộp thư Rác/Spam)");
       setStep(2); // Chuyển sang màn hình nhập OTP
     } catch (err) {
       setError(err.message);

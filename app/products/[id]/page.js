@@ -154,7 +154,7 @@ export default function ProductDetail({ params }) {
             <div className={styles.sellerProfileWidget}>
               <div className={styles.sellerWidgetHeader}>
                 <div className={styles.sellerWidgetAvatar}>
-                  {product.sellerName ? product.sellerName.charAt(0).toUpperCase() : 'B'}
+                  {product.sellerName ? String(product.sellerName).charAt(0).toUpperCase() : 'B'}
                 </div>
                 <div className={styles.sellerWidgetInfo}>
                   <div className={styles.sellerWidgetName}>

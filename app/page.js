@@ -114,7 +114,7 @@ export default function Home() {
                   </div>
                   <div className={styles.sellerMiniInfo}>
                     <div className={styles.sellerAvatar}>
-                      {product.sellerEmail ? product.sellerEmail.charAt(0).toUpperCase() : 'B'}
+                      {product.sellerEmail ? String(product.sellerEmail).charAt(0).toUpperCase() : 'B'}
                     </div>
                     <span className={styles.sellerName}>
                       {product.sellerEmail ? product.sellerEmail.split('@')[0] : 'BiếnTầnPro'}

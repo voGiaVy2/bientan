@@ -67,7 +67,7 @@ export default function RequestsPage() {
       const addPromise = addDoc(collection(db, "communityRequests"), {
         authorId: currentUser.uid,
         authorEmail: currentUser.email,
-        authorName: userProfile?.displayName || currentUser.email.split("@")[0],
+        authorName: userProfile?.displayName || currentUser?.email?.split("@")[0] || "Người dùng",
         role: userProfile?.role === "seller" ? "Người Bán" : "Người Mua",
         content: newContent.trim(),
         contact: newContact.trim(),
@@ -113,7 +113,7 @@ export default function RequestsPage() {
         id: Date.now(),
         authorId: currentUser.uid,
         author: currentUser.email,
-        authorName: userProfile?.displayName || currentUser.email.split("@")[0],
+        authorName: userProfile?.displayName || currentUser?.email?.split("@")[0] || "Người dùng",
         content: commentText,
         createdAt: Timestamp.now(),
       };
@@ -159,7 +159,7 @@ export default function RequestsPage() {
               !showForm ? (
                 <div className={styles.createPostPrompt} onClick={() => setShowForm(true)}>
                   <div className={styles.avatar}>
-                    {(userProfile?.displayName || currentUser.email).charAt(0).toUpperCase()}
+                    {String(userProfile?.displayName || currentUser.email || "?").charAt(0).toUpperCase()}
                   </div>
                   <div className={styles.promptText}>Bạn đang cần tìm mua hoặc bán linh kiện gì?</div>
                 </div>
@@ -167,9 +167,9 @@ export default function RequestsPage() {
                 <form onSubmit={handlePostRequest} className={styles.postForm}>
                   <div className={styles.formHeader}>
                     <div className={styles.avatar}>
-                      {(userProfile?.displayName || currentUser.email).charAt(0).toUpperCase()}
+                      {String(userProfile?.displayName || currentUser.email || "?").charAt(0).toUpperCase()}
                     </div>
-                    <span style={{ fontWeight: 600 }}>{userProfile?.displayName || currentUser.email.split("@")[0]}</span>
+                    <span style={{ fontWeight: 600 }}>{userProfile?.displayName || currentUser?.email?.split("@")[0] || "Người dùng"}</span>
                     <span className={`${styles.roleBadge} ${userProfile?.role === "seller" ? styles.sellerBadge : styles.buyerBadge}`}>
                       {userProfile?.role === "seller" ? "Người Bán" : "Người Mua"}
                     </span>
@@ -234,7 +234,7 @@ export default function RequestsPage() {
                 <div key={req.id} className={`${styles.postCard} animate-slide-up`}>
                   <div className={styles.postHeader}>
                     <div className={styles.postAvatar}>
-                      {(req.authorName || req.authorEmail || "?").charAt(0).toUpperCase()}
+                      {String(req.authorName || req.authorEmail || "?").charAt(0).toUpperCase()}
                     </div>
                     <div className={styles.postAuthorInfo}>
                       <div className={styles.authorName}>
@@ -284,7 +284,7 @@ export default function RequestsPage() {
                         {req.comments.map(comment => (
                           <div key={comment.id} className={styles.commentItem}>
                             <div className={styles.commentAvatar}>
-                              {(comment.authorName || comment.author || "?").charAt(0).toUpperCase()}
+                              {String(comment.authorName || comment.author || "?").charAt(0).toUpperCase()}
                             </div>
                             <div className={styles.commentBody}>
                               <div className={styles.commentHeader}>
@@ -307,7 +307,7 @@ export default function RequestsPage() {
                       onSubmit={(e) => handleCommentSubmit(e, req.id)}
                     >
                       <div className={styles.commentAvatarSmall}>
-                        {currentUser ? (userProfile?.displayName || currentUser.email).charAt(0).toUpperCase() : "?"}
+                        {currentUser ? String(userProfile?.displayName || currentUser.email || "?").charAt(0).toUpperCase() : "?"}
                       </div>
                       <input
                         type="text"
