@@ -108,7 +108,7 @@ export default function Header() {
                   {currentUser.photoURL ? (
                     <img src={currentUser.photoURL} alt={displayName} style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover" }} />
                   ) : (
-                    <span className={styles.avatarInitial}>{displayName.charAt(0).toUpperCase()}</span>
+                    <span className={styles.avatarInitial}>{String(displayName).charAt(0).toUpperCase()}</span>
                   )}
                   <strong>{displayName}</strong>
                 </Link>

@@ -43,7 +43,10 @@ function AdminPanel({ currentUser }) {
 
   const onlineUsersCount = users.filter(u => {
     if (!u.lastSeen) return false;
-    return now - u.lastSeen.toMillis() < 180000;
+    try {
+      const ms = u.lastSeen.toMillis ? u.lastSeen.toMillis() : u.lastSeen.getTime ? u.lastSeen.getTime() : Date.now();
+      return now - ms < 180000;
+    } catch(e) { return false; }
   }).length;
 
   return (
@@ -76,7 +79,11 @@ function AdminPanel({ currentUser }) {
             </thead>
             <tbody>
               {users.map((u) => {
-                const isOnline = u.lastSeen && (now - u.lastSeen.toMillis() < 180000);
+                let isOnline = false;
+                try {
+                  const ms = u.lastSeen?.toMillis ? u.lastSeen.toMillis() : u.lastSeen?.getTime ? u.lastSeen.getTime() : 0;
+                  isOnline = ms > 0 && (now - ms < 180000);
+                } catch(e) {}
                 return (
                   <tr key={u.id}>
                     <td style={{ fontWeight: 500 }}>{u.displayName || "Chưa có tên"}</td>
@@ -261,8 +268,8 @@ export default function Dashboard() {
             <div className={styles.userInfoCard}>
               <div className={styles.avatar}>
                 {currentUser.photoURL
-                  ? <img src={currentUser.photoURL} alt={displayName} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
-                  : displayName.charAt(0).toUpperCase()
+                  ? <img src={currentUser.photoURL} alt={String(displayName)} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
+                  : String(displayName).charAt(0).toUpperCase()
                 }
               </div>
               <div className={styles.userDetails}>
