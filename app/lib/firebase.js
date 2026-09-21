@@ -4,7 +4,7 @@
 
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { initializeFirestore, getFirestore } from 'firebase/firestore';
+import { initializeFirestore, getFirestore, memoryLocalCache } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -21,17 +21,20 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth    = getAuth(app);
 
-import { memoryLocalCache } from 'firebase/firestore';
-
 // Dùng memoryLocalCache thay vì persistentLocalCache để tránh QuotaExceededError
 // (persistentLocalCache lưu vào IndexedDB/localStorage → dễ bị đầy bộ nhớ)
+// Import memoryLocalCache cùng chỗ với initializeFirestore để tránh lỗi khi fallback
 let dbInstance;
-try {
-  dbInstance = initializeFirestore(app, {
-    localCache: memoryLocalCache()
-  });
-} catch (e) {
-  dbInstance = getFirestore(app);
+if (getApps().length > 0 && getApp()._options) {
+  // Nếu app đã có, thử lấy instance Firestore đã khởi tạo (tránh "already initialized" error)
+  try {
+    dbInstance = initializeFirestore(app, { localCache: memoryLocalCache() });
+  } catch {
+    // Firestore đã được khởi tạo trước đó → lấy instance cũ
+    dbInstance = getFirestore(app);
+  }
+} else {
+  dbInstance = initializeFirestore(app, { localCache: memoryLocalCache() });
 }
 export const db = dbInstance;
 export const storage = getStorage(app);
