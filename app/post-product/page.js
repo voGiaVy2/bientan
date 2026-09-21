@@ -83,8 +83,9 @@ export default function PostProductPage() {
         setUploadProgress("Đang tải ảnh lên máy chủ...");
         
         const imgbbKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
+        console.log("[DEBUG] ImgBB key có không:", !!imgbbKey);
         if (!imgbbKey) {
-          alert("Lỗi: Chưa cấu hình ImgBB API Key trong Vercel!");
+          alert("Lỗi: Chưa cấu hình NEXT_PUBLIC_IMGBB_API_KEY trong Vercel Environment Variables!");
           setIsSubmitting(false);
           return;
         }
@@ -92,17 +93,27 @@ export default function PostProductPage() {
         const formDataImg = new FormData();
         formDataImg.append("image", imageFile);
 
-        const uploadRes = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
-          method: "POST",
-          body: formDataImg,
-        });
+        console.log("[DEBUG] Bắt đầu upload ảnh lên ImgBB...");
+        let uploadRes;
+        try {
+          uploadRes = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
+            method: "POST",
+            body: formDataImg,
+          });
+        } catch (fetchErr) {
+          console.error("[DEBUG] Lỗi kết nối ImgBB:", fetchErr);
+          throw new Error("Không thể kết nối đến dịch vụ lưu ảnh. Kiểm tra mạng internet!");
+        }
         
+        console.log("[DEBUG] ImgBB HTTP status:", uploadRes.status);
         const uploadData = await uploadRes.json();
+        console.log("[DEBUG] ImgBB response:", JSON.stringify(uploadData));
+        
         if (uploadData.success) {
           imageUrl = uploadData.data.url;
           setUploadProgress("Ảnh đã tải lên thành công!");
         } else {
-          throw new Error("Tải ảnh thất bại. Dịch vụ lưu trữ đang bận.");
+          throw new Error(`ImgBB lỗi: ${uploadData.error?.message || uploadData.status_txt || 'Unknown error'}`);
         }
       }
 
@@ -144,7 +155,7 @@ export default function PostProductPage() {
       const newProductRef = doc(collection(db, "products"));
       
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 4000)
+        setTimeout(() => reject(new Error("TIMEOUT_FIREBASE")), 12000)
       );
 
       try {
@@ -155,9 +166,11 @@ export default function PostProductPage() {
         alert("Đăng tin thành công!");
       } catch (err) {
         if (err.message === "TIMEOUT_FIREBASE") {
-          // alert("Mạng hơi chậm nên đang đăng tin ngầm. Sản phẩm sẽ hiển thị ngay khi mạng ổn định!");
-          console.log("Offline write successful");
+          // Mạng chậm: offline write đã ghi vào bộ nhớ, sẽ tự sync khi online
+          console.log("Firebase timeout - offline write will sync later");
+          alert("Mạng hơi chậm! Tin đăng đang được lưu và sẽ hiển thị sau ít phút.");
         } else {
+          console.error("Firestore write error:", err.code, err.message);
           throw err;
         }
       }
@@ -165,8 +178,10 @@ export default function PostProductPage() {
       router.push(`/products/${newProductRef.id}`);
 
     } catch (error) {
-      console.error("Lỗi khi đăng tin:", error);
-      alert("Có lỗi xảy ra khi đăng tin. Vui lòng thử lại.");
+      console.error("[DEBUG] Lỗi khi đăng tin - message:", error.message);
+      console.error("[DEBUG] Lỗi khi đăng tin - code:", error.code);
+      console.error("[DEBUG] Lỗi khi đăng tin - full:", error);
+      alert(`Lỗi: ${error.message || 'Không xác định. Xem Console (F12) để biết thêm chi tiết.'}`);
     } finally {
       setIsSubmitting(false);
       setUploadProgress("");
